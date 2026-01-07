@@ -5,90 +5,135 @@ from datetime import datetime
 # --- 設定頁面 ---
 st.set_page_config(page_title="會議時間統整大師", layout="centered")
 
-# --- 初始化 Session State (資料庫) ---
-# 1. 存放最終確認的會議資料
-if 'event_data' not in st.session_state:
-    st.session_state.event_data = {
-        'title': '',
-        'slots': [],
-        'votes': {} 
+# --- CSS 美化樣式 ---
+# 這裡加一點 CSS 讓時段顯示變成圓角標籤 (Badge) 的樣子
+st.markdown("""
+<style>
+    .time-badge {
+        background-color: #e6f3ff;
+        color: #0068c9;
+        padding: 4px 12px;
+        border-radius: 16px;
+        border: 1px solid #cce5ff;
+        margin: 4px;
+        display: inline-block;
+        font-size: 0.9em;
+        font-weight: 600;
     }
+    .date-header {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #333;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# 2. 存放「建立中」的暫存時段 (像購物車一樣)
+# --- 邏輯函數 ---
+def reset_time_selection():
+    """當日期改變時，呼叫此函數來清空時段選擇"""
+    st.session_state.pick_times = []
+
+# --- 初始化 Session State ---
+if 'event_data' not in st.session_state:
+    st.session_state.event_data = {'title': '', 'slots': [], 'votes': {}}
+
 if 'temp_slots' not in st.session_state:
     st.session_state.temp_slots = []
 
-st.title("📅 會議時間統整小幫手 (多日版)")
-st.info("💡 提示：現在可以跨不同日期選擇多個時段囉！")
+st.title("📅 會議時間統整小幫手 (優化版)")
 
 # 分頁
 tab1, tab2, tab3 = st.tabs(["1. 主辦人建立", "2. 參與者投票", "3. 查看結果"])
 
 # ==========================================
-# === Tab 1: 主辦人建立會議 (大幅修改) ===
+# === Tab 1: 主辦人建立會議 ===
 # ==========================================
 with tab1:
     st.header("步驟一：設定會議名稱")
     title = st.text_input("會議名稱", placeholder="例如：Q1 產品規劃會議", value=st.session_state.event_data['title'])
     
-    st.divider() # 分隔線
+    st.divider() 
     
     st.header("步驟二：新增候選時段")
     
-    # 選擇介面
     col1, col2 = st.columns(2)
     with col1:
-        # 選擇日期
-        pick_date = st.date_input("選擇日期", min_value=datetime.today())
+        # 關鍵修改：加入 on_change 參數，當日期變更時，觸發 reset_time_selection
+        pick_date = st.date_input(
+            "選擇日期", 
+            min_value=datetime.today(),
+            on_change=reset_time_selection 
+        )
     with col2:
-        # 選擇該日期的時段
-        pick_times = st.multiselect("選擇該日期的時段", 
-                               ["09:00", "10:00", "11:00", "12:00", 
-                                "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"])
+        # 關鍵修改：加入 key="pick_times"，讓 Session State 可以控制它
+        pick_times = st.multiselect(
+            "選擇該日期的時段", 
+            ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"],
+            key="pick_times" 
+        )
     
-    # 【加入清單按鈕】
+    # 加入按鈕
     if st.button("➕ 加入候選清單"):
         if pick_times:
             for t in pick_times:
-                # 組合格式：2023-10-20 14:00
                 slot_str = f"{pick_date} {t}"
-                # 避免重複加入
                 if slot_str not in st.session_state.temp_slots:
                     st.session_state.temp_slots.append(slot_str)
-                    st.session_state.temp_slots.sort() # 排序讓視覺整齊
-            st.success(f"已加入 {len(pick_times)} 個時段！")
+                    st.session_state.temp_slots.sort() 
+            st.toast(f"已加入 {pick_date} 的 {len(pick_times)} 個時段！") # 使用 Toast 提示比較輕量
         else:
             st.error("請至少選擇一個時間點。")
 
-    # 顯示目前已加入的時段
+    # --- 美化後的預覽區 ---
     st.write("---")
-    st.subheader("已選時段預覽：")
+    st.subheader("📋 已選時段預覽")
     
     if st.session_state.temp_slots:
-        # 顯示成一個個的小標籤
-        st.write(st.session_state.temp_slots)
+        # 1. 先將資料依「日期」分組，這樣比較好讀
+        grouped_slots = {}
+        for slot in st.session_state.temp_slots:
+            # slot 格式為 "2023-10-20 14:00"
+            date_part, time_part = slot.split(' ', 1)
+            if date_part not in grouped_slots:
+                grouped_slots[date_part] = []
+            grouped_slots[date_part].append(time_part)
         
-        # 清除重選按鈕
-        if st.button("🗑️ 清空重選"):
-            st.session_state.temp_slots = []
-            st.rerun() # 重新整理頁面
+        # 2. 顯示分組後的資料
+        with st.container(border=True): # 使用外框包起來
+            for date_key, times in grouped_slots.items():
+                st.markdown(f"<div class='date-header'>📅 {date_key}</div>", unsafe_allow_html=True)
+                
+                # 組合 HTML 標籤
+                badges_html = ""
+                for t in times:
+                    badges_html += f"<span class='time-badge'>{t}</span>"
+                
+                st.markdown(badges_html, unsafe_allow_html=True)
+                st.write("") # 空行間隔
+        
+        # 清除按鈕放在右邊
+        col_act1, col_act2 = st.columns([4, 1])
+        with col_act2:
+            if st.button("🗑️ 全部清空"):
+                st.session_state.temp_slots = []
+                st.rerun()
     else:
-        st.caption("目前清單是空的，請上方選擇並加入。")
+        st.info("尚無資料，請由上方加入時段。")
 
     st.divider()
 
-    # 【最終生成按鈕】
-    if st.button("🚀 確認發布會議", type="primary"):
+    # 發布按鈕
+    if st.button("🚀 確認發布會議", type="primary", use_container_width=True):
         if title and st.session_state.temp_slots:
-            # 將暫存區轉正
             st.session_state.event_data['title'] = title
-            st.session_state.event_data['slots'] = st.session_state.temp_slots.copy() # 複製一份
-            st.session_state.event_data['votes'] = {} # 重置投票
-            
-            st.balloons() # 放氣球慶祝
-            st.success(f"會議「{title}」已建立！包含 {len(st.session_state.temp_slots)} 個時段。請切換分頁測試。")
+            st.session_state.event_data['slots'] = st.session_state.temp_slots.copy()
+            st.session_state.event_data['votes'] = {} 
+            st.balloons()
+            st.success(f"會議「{title}」已建立！請切換分頁測試。")
         else:
-            st.error("請輸入會議名稱，並至少加入一個時段。")
+            st.error("請輸入會議名稱並加入至少一個時段。")
 
 # ==========================================
 # === Tab 2: 參與者投票 (維持不變) ===
@@ -104,17 +149,26 @@ with tab2:
     else:
         st.subheader(f"會議：{current_title}")
         voter_name = st.text_input("您的姓名")
-        
         st.write("請勾選您有空的時間：")
         
         with st.form("voting_form"):
+            # 這裡也做一點小優化：分組顯示
+            current_date_group = ""
             selections = []
-            # 這裡會自動列出所有不同日期的時段
+            
             for slot in current_slots:
-                is_selected = st.checkbox(slot, key=slot)
+                date_part, time_part = slot.split(' ', 1)
+                
+                # 如果換日期了，就顯示日期標題
+                if date_part != current_date_group:
+                    st.markdown(f"**📅 {date_part}**")
+                    current_date_group = date_part
+                
+                is_selected = st.checkbox(f"{time_part}", key=slot)
                 selections.append(is_selected)
             
-            submit = st.form_submit_button("送出投票")
+            st.write("---")
+            submit = st.form_submit_button("送出投票", type="primary")
             
             if submit and voter_name:
                 st.session_state.event_data['votes'][voter_name] = selections
@@ -125,7 +179,6 @@ with tab2:
 # ==========================================
 with tab3:
     st.header("統計結果")
-    
     votes_dict = st.session_state.event_data['votes']
     slots = st.session_state.event_data['slots']
     
@@ -141,3 +194,4 @@ with tab3:
         
         st.success(f"🏆 最佳時段： **{best_slot}** ({max_votes} 票)")
         st.bar_chart(vote_counts)
+
