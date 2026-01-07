@@ -1,0 +1,108 @@
+import streamlit as st
+import pandas as pd
+from datetime import datetime, timedelta
+
+# --- 1. 設定頁面 ---
+st.set_page_config(page_title="會議時間統整大師", layout="centered")
+
+# --- 2. 模擬資料庫 (在實際應用中應連接 SQL 或 Firebase) ---
+if 'event_data' not in st.session_state:
+    st.session_state.event_data = {
+        'title': '',
+        'slots': [],
+        'votes': {}  # 格式: {'Amy': [True, False], 'Bob': [True, True]}
+    }
+
+# --- 3. 介面邏輯 ---
+
+st.title("📅 會議時間統整小幫手")
+
+# 分頁：建立會議 vs 參與投票
+tab1, tab2, tab3 = st.tabs(["我是主辦人 (建立)", "我是參與者 (投票)", "查看結果"])
+
+# === Tab 1: 主辦人建立會議 ===
+with tab1:
+    st.header("建立新會議")
+    title = st.text_input("會議名稱", placeholder="例如：Q1 產品規劃會議")
+    
+    # 選擇日期與時段
+    col1, col2 = st.columns(2)
+    with col1:
+        date = st.date_input("選擇日期", min_value=datetime.today())
+    with col2:
+        times = st.multiselect("選擇建議時段", 
+                               ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"])
+    
+    if st.button("生成會議"):
+        if title and times:
+            # 清空舊資料並儲存新資料
+            st.session_state.event_data['title'] = title
+            # 建立時段標籤 (Date + Time)
+            slots = [f"{date} {t}" for t in times]
+            st.session_state.event_data['slots'] = slots
+            st.session_state.event_data['votes'] = {} # 重置投票
+            st.success(f"會議「{title}」已建立！請切換到「投票」分頁測試。")
+        else:
+            st.error("請輸入名稱並至少選擇一個時段。")
+
+# === Tab 2: 參與者投票 ===
+with tab2:
+    st.header("填寫有空的時間")
+    
+    current_title = st.session_state.event_data['title']
+    current_slots = st.session_state.event_data['slots']
+    
+    if not current_title:
+        st.warning("目前沒有進行中的會議調查。")
+    else:
+        st.subheader(f"會議：{current_title}")
+        voter_name = st.text_input("您的姓名")
+        
+        st.write("請勾選您有空的時間：")
+        
+        # 建立表單來收集勾選狀態
+        with st.form("voting_form"):
+            selections = []
+            for slot in current_slots:
+                # 預設不勾選
+                is_selected = st.checkbox(slot, key=slot)
+                selections.append(is_selected)
+            
+            submit = st.form_submit_button("送出投票")
+            
+            if submit and voter_name:
+                # 儲存投票結果
+                st.session_state.event_data['votes'][voter_name] = selections
+                st.success(f"{voter_name}，您的投票已記錄！")
+            elif submit and not voter_name:
+                st.error("請輸入姓名。")
+
+# === Tab 3: 查看統計結果 ===
+with tab3:
+    st.header("統計結果")
+    
+    votes_dict = st.session_state.event_data['votes']
+    slots = st.session_state.event_data['slots']
+    
+    if not votes_dict:
+        st.info("尚無人投票。")
+    else:
+        # 將資料轉換為 DataFrame 以便展示
+        # 行(Index)是參與者，列(Columns)是時段
+        df = pd.DataFrame(votes_dict, index=slots).T
+        
+        # 將 True/False 轉為 Emoji 比較好讀
+        display_df = df.applymap(lambda x: "✅ OK" if x else "❌")
+        
+        st.table(display_df)
+        
+        # 統計每個時段的總得票數
+        st.subheader("最佳時段推薦")
+        vote_counts = df.sum(axis=0) # 計算每一欄(時段)有多少 True
+        best_slot = vote_counts.idxmax()
+        max_votes = vote_counts.max()
+        
+        st.success(f"目前最佳時段是： **{best_slot}** ({max_votes} 人有空)")
+        
+        # 顯示直條圖
+        st.bar_chart(vote_counts)
