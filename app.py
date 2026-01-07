@@ -50,7 +50,7 @@ if 'event_data' not in st.session_state:
 if 'temp_slots' not in st.session_state:
     st.session_state.temp_slots = []
 
-st.title("📅 會議時間統整小幫手 (優化版)")
+st.title("會議時間統整小幫手")
 
 # 分頁
 tab1, tab2, tab3 = st.tabs(["1. 主辦人建立", "2. 參與者投票", "3. 查看結果"])
@@ -189,6 +189,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
