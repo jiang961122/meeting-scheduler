@@ -35,8 +35,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 載入並編碼圖片 ---
-green_check_img = "https://www.flaticon.com/free-icon/accept_4315445?term=check&page=1&position=12&origin=search&related_id=4315445"
-red_cross_img = "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"  # 範例：圓形紅叉
+green_check_img = "ttps://cdn-icons-png.flaticon.com/512/148/148767.png"
+red_cross_img = "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"
 
 
 # --- 邏輯函數 ---
@@ -191,6 +191,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
