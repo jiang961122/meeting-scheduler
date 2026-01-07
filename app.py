@@ -192,17 +192,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
-        })
-        
-        # 使用橫向長條圖 (horizontal=True)，並設定顏色
-        st.bar_chart(
-            chart_data,
-            x="票數",
-            y="時段",
-            color="#0068c9", # 使用一個單一顏色，與主題一致
-            horizontal=True,
-            use_container_width=True
-        )
+
 
 
 
