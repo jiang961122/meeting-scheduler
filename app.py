@@ -35,29 +35,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 載入並編碼圖片 ---
-def get_image_base64(image_path):
-    with open(image_path, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode()
-    return f"data:image/png;base64,{encoded_string}"
-
-# 這裡需要確保您的圖片 image_0.png 和 app.py 在同一個目錄下
-# 如果您的圖片是兩張分開的，請分別準備並替換路徑
-# 假設您的圖片是單一張包含兩個圖示的，我們需要切割它 (這在Streamlit不方便)，
-# 所以這裡我們假設您已經將圖片切分成兩個檔案：green_check.png 和 red_cross.png
-# **請您準備兩張圖片：green_check.png 和 red_cross.png，並放在與 app.py 相同的目錄下**
-
-# 如果沒有圖片，請先建立它們 (這裡用程式碼生成一個紅綠方塊代替，您可以替換成真實圖片路徑)
-import numpy as np
-from PIL import Image
-if not pd.io.common.file_exists("green_check.png"):
-    img = Image.fromarray(np.full((20, 20, 3), [0, 255, 0], dtype=np.uint8))
-    img.save("green_check.png")
-if not pd.io.common.file_exists("red_cross.png"):
-    img = Image.fromarray(np.full((20, 20, 3), [255, 0, 0], dtype=np.uint8))
-    img.save("red_cross.png")
-
-green_check_img = get_image_base64("green_check.png")
-red_cross_img = get_image_base64("red_cross.png")
+green_check_img = "https://www.flaticon.com/free-icon/accept_4315445?term=check&page=1&position=12&origin=search&related_id=4315445"
+red_cross_img = "https://cdn-icons-png.flaticon.com/512/1828/1828665.png"  # 範例：圓形紅叉
 
 
 # --- 邏輯函數 ---
@@ -212,6 +191,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
