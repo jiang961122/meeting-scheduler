@@ -176,12 +176,32 @@ with tab3:
     else:
         df = pd.DataFrame(votes_dict, index=slots).T
         
-        # 1. 將 True/False 替換為圖片的 HTML 標籤
-        styled_df = df.applymap(lambda x: f'<img src="{green_check_img}" width="20" />' if x else f'<img src="{red_cross_img}" width="20" />')
-        
+      # 1. 定義背景顏色的函數 (在這裡修改色碼)
+        def highlight_bg(val):
+            # 如果是有空 (True)，背景色設為淺綠色 (#e6f4ea)
+            # 如果是沒空 (False)，背景色設為淺紅色 (#fce8e6)
+            color = '#e6f4ea' if val else '#fce8e6' 
+            return f'background-color: {color}'
+
+        # 2. 定義顯示圖片的函數
+        def show_images(val):
+            if val:
+                # 為了美觀，我們加一點置中樣式
+                return f'<div style="text-align:center"><img src="{green_check_img}" width="24" /></div>'
+            else:
+                return f'<div style="text-align:center"><img src="{red_cross_img}" width="24" /></div>'
+
         st.write("### 投票明細")
-        # 使用 st.write 並開啟 unsafe_allow_html=True 來渲染圖片
-        st.write(styled_df.to_html(escape=False), unsafe_allow_html=True)
+        
+        # 3. 應用樣式並渲染
+        # map() 用來處理背景色，format() 用來處理圖片內容
+        st.write(
+            df.style
+            .map(highlight_bg)  # 應用背景色
+            .format(show_images) # 應用圖片
+            .to_html(escape=False), # 轉為 HTML
+            unsafe_allow_html=True
+        )
         
         # 2. 統計每個時段的總得票數
         vote_counts = df.sum(axis=0)
@@ -192,6 +212,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
