@@ -157,7 +157,7 @@ with tab3:
         
       # 1. 定義背景顏色的函數 (在這裡修改色碼)
         def highlight_bg(val):
-            color = '#B2B5C2' if val else '#B2B5C2' 
+            color = '#EDDDDD' if val else '#EDDDDD' 
             return f'background-color: {color}'
 
         # 2. 定義顯示圖片的函數
@@ -189,6 +189,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
