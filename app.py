@@ -192,12 +192,6 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
-        # 3. 更換圖表樣式：使用橫向長條圖
-        st.subheader("📊 各時段得票統計")
-        # 將資料轉為適合 Altair (Streamlit底層圖表庫) 的格式
-        chart_data = pd.DataFrame({
-            '時段': vote_counts.index,
-            '票數': vote_counts.values
         })
         
         # 使用橫向長條圖 (horizontal=True)，並設定顏色
@@ -209,5 +203,6 @@ with tab3:
             horizontal=True,
             use_container_width=True
         )
+
 
 
