@@ -180,7 +180,7 @@ with tab3:
         def highlight_bg(val):
             # 如果是有空 (True)，背景色設為淺綠色 (#e6f4ea)
             # 如果是沒空 (False)，背景色設為淺紅色 (#fce8e6)
-            color = '#e6f4ea' if val else '#fce8e6' 
+            color = '#e3f2fd' if val else '#f5f5f5' 
             return f'background-color: {color}'
 
         # 2. 定義顯示圖片的函數
@@ -212,6 +212,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
