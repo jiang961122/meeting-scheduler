@@ -187,9 +187,9 @@ with tab3:
         def show_images(val):
             if val:
                 # 為了美觀，我們加一點置中樣式
-                return f'<div style="text-align:center"><img src="{blue_check_img}" width="24" /></div>'
+                return f'<div style="text-align:center"><img src="{green_check_img}" width="24" /></div>'
             else:
-                return f'<div style="text-align:center"><img src="{green_cross_img}" width="24" /></div>'
+                return f'<div style="text-align:center"><img src="{red_cross_img}" width="24" /></div>'
 
         st.write("### 投票明細")
         
@@ -212,6 +212,7 @@ with tab3:
         st.subheader("🏆 最佳時段推薦")
         st.success(f"目前最佳時段是： **{best_slot}**，共有 **{max_votes}** 人有空。")
         
+
 
 
 
