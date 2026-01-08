@@ -4,7 +4,7 @@ from datetime import datetime
 import base64
 
 # --- 設定頁面 ---
-st.set_page_config(page_title="會議時間統整大師", layout="centered")
+st.set_page_config(page_title="活動時間統整大師", layout="centered")
 
 # --- CSS 美化樣式 (您的版本) ---
 st.markdown("""
@@ -60,9 +60,9 @@ def show_voting_page():
     current_slots = st.session_state.event_data['slots']
     
     if not current_title:
-        st.warning("👈 目前沒有進行中的會議 (請聯絡主辦人建立)。")
+        st.warning("👈 目前沒有進行中的活動 (請聯絡主辦人建立)。")
     else:
-        st.subheader(f"會議：{current_title}")
+        st.subheader(f"活動：{current_title}")
         voter_name = st.text_input("您的姓名")
         st.write("請勾選您有空的時間：")
         
@@ -134,7 +134,7 @@ def show_results_page():
 # === 主程式邏輯 (權限控制) ===
 # ==========================================
 
-st.title("會議時間統整小幫手")
+st.title("統整時間小幫手")
 
 # --- 側邊欄：權限控制 ---
 with st.sidebar:
@@ -156,8 +156,8 @@ if is_admin:
     
     # Tab 1: 放入您優化過的「建立會議」程式碼
     with tab1:
-        st.header("步驟一：設定會議名稱")
-        title = st.text_input("會議名稱", placeholder="例如：Q1 產品規劃會議", value=st.session_state.event_data['title'])
+        st.header("步驟一：設定活動名稱")
+        title = st.text_input("活動名稱", placeholder="例如：我們的午餐約會", value=st.session_state.event_data['title'])
         st.divider()
         st.header("步驟二：新增候選時段")
         col1, col2 = st.columns(2)
@@ -203,15 +203,15 @@ if is_admin:
             st.info("尚無資料，請由上方加入時段。")
         
         st.divider()
-        if st.button("🚀 確認發布會議", type="primary", use_container_width=True):
+        if st.button(" 確認發布活動🚀", type="primary", use_container_width=True):
             if title and st.session_state.temp_slots:
                 st.session_state.event_data['title'] = title
                 st.session_state.event_data['slots'] = st.session_state.temp_slots.copy()
                 st.session_state.event_data['votes'] = {}
                 st.balloons()
-                st.success(f"會議「{title}」已建立！請切換分頁測試。")
+                st.success(f"活動「{title}」已建立！請切換分頁測試。")
             else:
-                st.error("請輸入會議名稱並加入至少一個時段。")
+                st.error("請輸入活動名稱並加入至少一個時段。")
 
     # Tab 2: 呼叫投票頁面函數
     with tab2:
@@ -224,3 +224,4 @@ if is_admin:
 else:
     # === 訪客模式：只顯示投票頁面 ===
     show_voting_page()
+
