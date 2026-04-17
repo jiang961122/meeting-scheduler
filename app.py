@@ -53,20 +53,40 @@ red_cross = "https://cdn-icons-png.flaticon.com/128/10308/10308565.png"
 # --- 主程式 ---
 st.title("📅 會議時間統整小幫手")
 
-# 側邊欄重新整理按鈕
+# === 側邊欄設計 ===
 with st.sidebar:
-    admin_pw = st.text_input("管理員密碼", type="password")
-    if st.button("🔄 刷新資料"):
+    st.header("切換身分")
+    # 使用水平排列的 radio 製作兩個切換按鈕
+    user_mode = st.radio(
+        "選擇模式", 
+        ["👤 訪客模式", "👨‍💼 管理員模式"], 
+        horizontal=True, 
+        label_visibility="collapsed" # 隱藏標題讓畫面更簡潔
+    )
+    
+    is_admin = False
+    if user_mode == "👨‍💼 管理員模式":
+        admin_pw = st.text_input("請輸入密碼解鎖", type="password")
+        if admin_pw == "1234":
+            is_admin = True
+            st.success("解鎖成功！")
+        elif admin_pw != "":
+            st.error("密碼錯誤")
+            
+    st.divider() # 加入一條灰色分隔線
+    
+    if st.button("🔄 刷新雲端資料"):
         st.session_state.cloud_data = load_cloud_data()
 
-# 初始讀取
+# === 初始讀取 ===
 if 'cloud_data' not in st.session_state:
     st.session_state.cloud_data = load_cloud_data()
 
 data = st.session_state.cloud_data
 
-# 分流邏輯
-if admin_pw == "1234":
+# === 分流邏輯 ===
+# 將原本的 if admin_pw == "1234": 改成 if is_admin:
+if is_admin:
     tab1, tab2 = st.tabs(["🆕 建立新會議", "📊 查看結果"])
     
     with tab1:
