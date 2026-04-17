@@ -147,7 +147,7 @@ else:
                 if user_name:
                     _, ws_vote = connect_to_sheet()
                     ws_vote.append_row([user_name] + [1 if c else 0 for c in user_choices])
-                    st.success("投票已上傳雲端，謝謝您的參與！")
+                    st.success("投票已上傳，謝謝您！")
                     st.session_state.cloud_data = load_cloud_data()
                 else:
                     st.error("請輸入姓名")
