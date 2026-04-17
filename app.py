@@ -100,9 +100,16 @@ if is_admin:
                 if s not in st.session_state.temp_slots: st.session_state.temp_slots.append(s)
             st.session_state.temp_slots.sort()
             
-        if st.session_state.temp_slots:
-            st.write("目前已選時段：", st.session_state.temp_slots)
+       if st.session_state.temp_slots:
+            st.markdown("#### 目前已選時段：")
+            # 透過迴圈將每個時段變成 Markdown 的條列式項目
+            for slot in st.session_state.temp_slots:
+                st.markdown(f"* {slot}")
+            
+            st.write("") # 增加一點換行空白，讓畫面不擁擠
+            
             if st.button("🚀 發布並覆蓋雲端舊活動", type="primary"):
+                ws_set, ws_vote = connect_to_sheet()
                 ws_set, ws_vote = connect_to_sheet()
                 ws_set.clear()
                 # 調整 3：將標題、說明、時段依序寫入 Google Sheets
