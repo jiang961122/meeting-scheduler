@@ -82,7 +82,6 @@ if is_admin:
     
     with tab1:
         new_title = st.text_input("會議名稱", placeholder="請輸入會議名稱")
-        # 調整 3：增加會議內容說明的輸入欄位
         new_desc = st.text_area("會議內容說明", placeholder="請輸入會議議程或注意事項...")
         
         st.divider()
@@ -91,7 +90,7 @@ if is_admin:
         with col1:
             pick_date = st.date_input("選擇日期")
         with col2:
-            pick_times = st.multiselect("選擇時段", ["09:00","10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"])
+            pick_times = st.multiselect("選擇時段", ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"])
         
         if 'temp_slots' not in st.session_state: st.session_state.temp_slots = []
         if st.button("➕ 加入候選時段"):
@@ -100,18 +99,17 @@ if is_admin:
                 if s not in st.session_state.temp_slots: st.session_state.temp_slots.append(s)
             st.session_state.temp_slots.sort()
             
-      if st.session_state.temp_slots:
+        # 就是這裡的對齊問題！現在這行已經跟上面的 if st.button 完美對齊了
+        if st.session_state.temp_slots:
             st.markdown("#### 目前已選時段：")
-            # 透過迴圈將每個時段變成 Markdown 的條列式項目
             for slot in st.session_state.temp_slots:
                 st.markdown(f"* {slot}")
             
-            st.write("") # 增加一點換行空白，讓畫面不擁擠
+            st.write("") 
             
             if st.button("🚀 發布並覆蓋雲端舊活動", type="primary"):
                 ws_set, ws_vote = connect_to_sheet()
                 ws_set.clear()
-                # 調整 3：將標題、說明、時段依序寫入 Google Sheets
                 ws_set.update([["Title", new_title], ["Description", new_desc], ["Slots", ",".join(st.session_state.temp_slots)]])
                 ws_vote.clear()
                 ws_vote.append_row(["姓名"] + st.session_state.temp_slots)
@@ -119,7 +117,6 @@ if is_admin:
                 st.session_state.temp_slots = []
                 st.session_state.cloud_data = load_cloud_data()
                 st.rerun()
-
     with tab2:
         if data and data['votes']:
             st.header(data['title']) # 管理員也能看到標題
