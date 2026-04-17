@@ -90,7 +90,7 @@ if is_admin:
         with col1:
             pick_date = st.date_input("選擇日期")
         with col2:
-            pick_times = st.multiselect("選擇時段", ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"])
+            pick_times = st.multiselect("選擇時段", ["09:00","10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"])
         
         if 'temp_slots' not in st.session_state: st.session_state.temp_slots = []
         if st.button("➕ 加入候選時段"):
