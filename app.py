@@ -56,7 +56,7 @@ st.title("📅 會議時間統整小幫手")
 # 側邊欄重新整理按鈕
 with st.sidebar:
     admin_pw = st.text_input("管理員密碼", type="password")
-    if st.button("🔄 刷新雲端資料"):
+    if st.button("🔄 刷新資料"):
         st.session_state.cloud_data = load_cloud_data()
 
 # 初始讀取
@@ -102,7 +102,7 @@ if admin_pw == "1234":
 else:
     # 訪客投票介面
     if not data:
-        st.warning("目前雲端沒有進行中的活動。")
+        st.warning("目前沒有進行中的活動。")
     else:
         st.header(f"會議：{data['title']}")
         user_name = st.text_input("您的姓名")
