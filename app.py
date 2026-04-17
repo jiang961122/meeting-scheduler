@@ -72,7 +72,7 @@ if admin_pw == "1234":
     with tab1:
         new_title = st.text_input("會議名稱")
         pick_date = st.date_input("日期")
-        pick_times = st.multiselect("時段", ["09:00", "10:00", "11:00","12:00","13:00","14:00","15:00","16:00"])
+        pick_times = st.multiselect("時段", ["10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00"])
         
         if 'temp_slots' not in st.session_state: st.session_state.temp_slots = []
         if st.button("➕ 加入清單"):
